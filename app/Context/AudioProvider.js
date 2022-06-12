@@ -40,6 +40,17 @@ export class AudioProvider extends Component {
       first: media.totalCount,
     });
 
+    // console.log(media.assets);
+    
+    const tmp = [];
+    media.assets = media.assets.map(value => {
+      return ({
+        ...value,
+        'url': value.uri,
+        'title': value.fullname
+      })
+    })
+
     this.setState({ ...this.state,dataProvider: dataProvider.cloneWithRows([...audioFiles, ...media.assets]),audioFiles: [...audioFiles, ...media.assets] });
   };
 

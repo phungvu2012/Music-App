@@ -1,10 +1,20 @@
 import { Text, View, StyleSheet, ScrollView, Dimensions } from "react-native";
-import React, { Component } from "react";
+import React, { Component, useContext } from "react";
 import { AudioContext } from "../Context/AudioProvider";
 import { RecyclerListView, LayoutProvider } from "recyclerlistview";
 import AudioListItem from "../components/AudioListItem";
 import Screen from "../components/Screen";
 import OptionModal from "../components/OptionModal";
+import TrackPlayer, {
+  Capability,
+  Event,
+  RepeatMode,
+  State,
+  usePlaybackState,
+  useProgress,
+  useTrackPlayerEvents,
+} from "react-native-track-player";
+// import { AudioControllerContext } from "../Context/AudioController";
 
 export class AudioList extends Component {
   static contextType = AudioContext;
@@ -13,6 +23,7 @@ export class AudioList extends Component {
     super(props);
     this.state = {
       optionModalVisible: false,
+      soundObj: null,
     };
 
     this.currentItem = {};
@@ -33,12 +44,21 @@ export class AudioList extends Component {
     }
   );
 
+  handleAudioPress = async (audio) => {
+    console.log("track player");
+
+    await TrackPlayer.add([audio]);
+    // await TrackPlayer.play();
+    togglePlayBack();
+  };
+
   rowRenderer = (type, item) => {
     console.log(item);
     return (
       <AudioListItem
         title={item.filename}
         duration={item.duration}
+        onAudioPress={() => this.handleAudioPress(item)}
         onOptionPress={() => {
           this.currentItem = item;
           this.setState({ ...this.state, optionModalVisible: true });
