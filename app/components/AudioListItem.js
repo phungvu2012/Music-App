@@ -4,10 +4,12 @@ import {
   View,
   Dimensions,
   TouchableWithoutFeedback,
+  Image,
 } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import color from "../misc/color";
+import PlayingImage from "./../../assets/musicplaying.gif";
 
 const getThumbnailText = (filename) => {
   return filename[0];
@@ -17,21 +19,42 @@ const convertTime = (minutes) => {
   return new Date(minutes * 1000).toLocaleTimeString().substring(3);
 };
 
+const renderPlayPauseIcon = (isPlaying) => {
+  if (isPlaying)
+    return <Entypo name="controller-paus" size={24} color={color.ACTIVE_FONT} />;
+  else return <Entypo name="controller-play" size={24} color={color.ACTIVE_FONT} />;
+};
+
 export default function AudioListItem({
   title,
   duration,
   onOptionPress,
   onAudioPress,
+  isPlaying,
+  activeListItem,
 }) {
+  console.log("hello: ", isPlaying);
   return (
     <>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onAudioPress}>
           <View style={styles.leftContainer}>
-            <View style={styles.thumbnail}>
+            <View
+              style={[
+                styles.thumbnail,
+                {
+                  backgroundColor: activeListItem
+                    ? color.ACTIVE_BG
+                    : color.FONT_LIGHT,
+                },
+              ]}
+            >
               <Text style={styles.thumbnailText}>
-                {getThumbnailText(title)}
+                {activeListItem
+                  ? renderPlayPauseIcon(isPlaying)
+                  : getThumbnailText(title)}
               </Text>
+              {/* {isPlaying && <Image source={PlayingImage} style={styles.playingAudio} />} */}
             </View>
             <View style={styles.titleContainer}>
               <Text style={styles.title} numberOfLines={1}>
@@ -75,20 +98,30 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: 'red',
   },
   thumbnail: {
+    position: "relative",
     height: 50,
     flexBasis: 50,
     backgroundColor: color.FONT_LIGHT,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 25,
+    overflow: "hidden",
   },
   thumbnailText: {
     fontSize: 22,
     fontWeight: "bold",
     color: color.FONT,
+  },
+  playingAudio: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 2,
+    opacity: 0.2,
   },
   titleContainer: {
     width: width - 180,

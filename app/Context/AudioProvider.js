@@ -66,7 +66,7 @@ export class AudioProvider extends Component {
     if (permission.granted) {
       // we want to get all the audio files
       this.getAudioFiles();
-      console.log(this.state.audioFiles)
+      // console.log(this.state.audioFiles)
     }
 
     if (!permission.canAskAgain && !permission.granted) {

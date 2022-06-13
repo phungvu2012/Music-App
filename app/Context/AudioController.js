@@ -14,7 +14,6 @@ const setupPlayer = async () => {
   console.log("controller");
   try {
     await TrackPlayer.setupPlayer();
-
   } catch (e) {
     console.log(e);
   }
@@ -24,36 +23,60 @@ export const AudioControllerContext = createContext();
 
 export default function AudioController({ children }) {
   const [state, setState] = useState();
-  const [ playback, setPlayback ] = useState(); // play, pause, another
+  const [playback, setPlayback] = useState(); // play, pause, another, new
   const playBackState = usePlaybackState();
 
   useEffect(() => {
     setupPlayer();
-  }, [])
+  }, []);
 
-  useEffect(() => {
-  }, [playback])
-
-  const togglePlayBack = async () => {
-    const currentTrack = await TrackPlayer.getCurrentTrack();
-    console.log('currentTrack', playBackState, State.Playing);
-    if (currentTrack != null) {
-      if (playBackState == State.Paused) {
-        console.log('play')
-        await TrackPlayer.play();
-      } else {
-        console.log('pause')
-        await TrackPlayer.pause();
-      }
+  const playAudio = async () => {
+    try {
+      await TrackPlayer.play();
+    } catch (error) {
+      console.log("error inside play helper method: ", error?.message);
     }
   };
+
+  const pauseAudio = async () => {
+    try {
+      await TrackPlayer.pause();
+    } catch (error) {
+      console.log("error inside play helper method: ", error?.message);
+    }
+  };
+
+  const newAudio = async (audio) => {
+    try {
+      await TrackPlayer.add([audio]);
+      await TrackPlayer.play();
+    } catch (error) {
+      console.log("error inside play helper method: ", error?.message);
+    }
+  };
+
+  const anotherAudio = async (audio) => {
+    try {
+      await TrackPlayer.reset();
+      await TrackPlayer.add([audio]);
+      await TrackPlayer.play();
+    } catch (error) {
+      console.log("error inside play helper method: ", error?.message);
+    }
+  };
+
+  const togglePlayBack = async (newSong) => {};
 
   const data = {
     playback,
     setPlayback,
     playBackState,
-    togglePlayBack
-  }
+    togglePlayBack,
+    playAudio,
+    pauseAudio,
+    newAudio,
+    anotherAudio,
+  };
 
   return (
     <AudioControllerContext.Provider value={data}>
