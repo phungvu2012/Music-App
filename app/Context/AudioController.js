@@ -14,6 +14,19 @@ const setupPlayer = async () => {
   console.log("controller");
   try {
     await TrackPlayer.setupPlayer();
+
+    await TrackPlayer.updateOptions({
+      stopWithApp: true,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
+        Capability.SeekTo,
+      ],
+      compactCapabilities: [Capability.Play, Capability.Pause],
+    });
   } catch (e) {
     console.log(e);
   }
@@ -55,11 +68,12 @@ export default function AudioController({ children }) {
     }
   };
 
-  const anotherAudio = async (audio) => {
+  const anotherAudio = async (audio, callback) => {
     try {
       await TrackPlayer.reset();
       await TrackPlayer.add([audio]);
       await TrackPlayer.play();
+      if (typeof callback === "function") callback();
     } catch (error) {
       console.log("error inside play helper method: ", error?.message);
     }

@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, ScrollView, Dimensions } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TextInput,
+} from "react-native";
 import React, { Component, useContext } from "react";
 import { AudioContext } from "../Context/AudioProvider";
 import { RecyclerListView, LayoutProvider } from "recyclerlistview";
@@ -15,6 +22,9 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from "react-native-track-player";
 import { AudioControllerContext } from "../Context/AudioController";
+import { Ionicons } from "@expo/vector-icons";
+import color from "../misc/color";
+import { DataProvider } from "recyclerlistview";
 
 export class AudioList extends Component {
   static contextType = AudioControllerContext;
@@ -26,9 +36,21 @@ export class AudioList extends Component {
       soundPlay: null,
       currentAudio: {},
       isPlaying: false,
+      textSearch: "",
+      dataProviderSearch: new DataProvider((r1, r2) => r1 !== r2),
     };
 
     this.currentItem = {};
+  }
+
+  async componentDidUpdate() {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    if (currentTrack !== null) {
+      const song = await TrackPlayer.getTrack(currentTrack);
+      if (this.state.currentAudio.toString() !== song) {
+        console.log("changedddd: ", this.state.currentAudio);
+      }
+    }
   }
 
   layoutProvider = new LayoutProvider(
@@ -47,13 +69,11 @@ export class AudioList extends Component {
   );
 
   handleAudioPress = async (audio) => {
-    console.log("track player");
-
     const currentTrack = await TrackPlayer.getCurrentTrack();
     if (currentTrack != null) {
       const song = await TrackPlayer.getTrack(currentTrack);
       // console.log("currentTrack: ", song);
-      this.setState({ ...this.state, currentAudio: song });
+      this.setState({ ...this.state, currentAudio: audio });
 
       if (song.id !== audio.id || song.url !== audio.url) {
         console.log("skip");
@@ -62,7 +82,9 @@ export class AudioList extends Component {
           isPlaying: true,
           soundPlay: "another",
         });
-        this.context.anotherAudio(audio);
+        this.context.anotherAudio(audio, () =>
+          this.props.navigation.navigate("Player")
+        );
       } else if (this.context.playBackState == State.Paused) {
         console.log("play");
         this.setState({
@@ -71,14 +93,16 @@ export class AudioList extends Component {
           soundPlay: "play",
         });
         this.context.playAudio();
+        this.props.navigation.navigate("Player");
       } else {
         console.log("pause");
         this.setState({
-          ...this.state, 
+          ...this.state,
           isPlaying: false,
           soundPlay: "pause",
         });
         this.context.pauseAudio();
+        this.props.navigation.navigate("Player");
       }
     } else {
       console.log("new");
@@ -86,21 +110,27 @@ export class AudioList extends Component {
         ...this.state,
         isPlaying: true,
         soundPlay: "new",
+        currentAudio: audio,
       });
       this.context.newAudio(audio);
+      this.props.navigation.navigate("Player");
     }
   };
 
   rowRenderer = (type, item, index, extendedState) => {
     // console.log('this.state.currentAudio: ', this.state.currentAudio);
-    console.log('item: ', this.state.currentAudio);
-    console.log('isIndex: ', this.state.currentAudio === item);
+    // console.log("item: ", item);
+    // console.log("isIndex: ", this.state.currentAudio === item);
     return (
       <AudioListItem
         title={item.filename}
         duration={item.duration}
         onAudioPress={() => this.handleAudioPress(item)}
-        activeListItem={this.state.currentAudio && item?.id === this.state.currentAudio?.id && item?.url === this.state.currentAudio?.url}
+        activeListItem={
+          this.state.currentAudio &&
+          item?.id === this.state.currentAudio?.id &&
+          item?.url === this.state.currentAudio?.url
+        }
         onOptionPress={() => {
           this.currentItem = item;
           this.setState({ ...this.state, optionModalVisible: true });
@@ -110,15 +140,46 @@ export class AudioList extends Component {
     );
   };
 
+  filterData = (list) => {
+    return list.filter((value) => {
+      return value.toString().indexOf() === textSearch;
+    });
+  };
+
+  handleSearch = (text, listAudio) => {
+    this.setState({
+      ...this.state,
+      textSearch: text,
+      dataProviderSearch: this.state.dataProviderSearch.cloneWithRows(
+        this.filterData(listAudio)
+      ),
+    });
+    console.log(this.state.textSearch);
+  };
+
   render() {
     return (
       <AudioContext.Consumer>
-        {({ dataProvider }) => {
+        {({ dataProvider, updateState, audioFiles }) => {
           return (
             <AudioControllerContext.Consumer>
               {({ data }) => {
                 return (
                   <Screen>
+                    <View style={styles.searchContainer}>
+                      <Ionicons
+                        name="ios-search-outline"
+                        size={30}
+                        color="#777"
+                        style={styles.searchIcon}
+                      />
+                      <TextInput
+                        value={this.state.textSearch}
+                        onChangeText={(text) => this.handleSearch(text)}
+                        style={styles.searchInput}
+                      />
+                    </View>
+                    {/* {console.log("hello: ", audioFiles)} */}
                     <RecyclerListView
                       dataProvider={dataProvider}
                       layoutProvider={this.layoutProvider}
@@ -126,10 +187,15 @@ export class AudioList extends Component {
                       extendedState={{ isPlaying: this.state.isPlaying }}
                     />
                     <OptionModal
-                      onPlayPress={() => console.log("Play audio")}
-                      onPlayListPress={() =>
-                        console.log("Add audio to playlist")
+                      onPlayPress={() =>
+                        this.handleAudioPress(this.currentItem)
                       }
+                      onPlayListPress={() => {
+                        updateState(this.context, {
+                          addToPlayList: this.currentItem,
+                        });
+                        this.props.navigation.navigate("PlayList");
+                      }}
                       currentItem={this.currentItem}
                       visible={this.state.optionModalVisible}
                       onClose={() =>
@@ -155,6 +221,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "red",
+    borderRadius: 20,
+    marginHorizontal: 10,
+    marginBottom: 35,
+    borderColor: color.ACTIVE_BG,
+    borderWidth: 1,
+    borderStyle: "solid",
+    overflow: "hidden",
+  },
+  searchIcon: {
+    paddingHorizontal: 10,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontWeight: "bold",
+    fontSize: 18,
+    // backgroundColor: "yellow",
+    paddingHorizontal: 15,
   },
 });
 

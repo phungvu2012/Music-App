@@ -33,7 +33,7 @@ export default function AudioListItem({
   isPlaying,
   activeListItem,
 }) {
-  console.log("hello: ", isPlaying);
+  
   return (
     <>
       <View style={styles.container}>
