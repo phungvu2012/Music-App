@@ -15,9 +15,10 @@ export default function AppNavigator() {
       headerStyle: {
         backgroundColor: '#121212',
       },
-      headerTintColor: '#eee'
+      headerTintColor: '#eee',
+
     }}>
-      <Stack.Screen name="Danh sach nhac" component={AudioScreen} />
+      <Stack.Screen name="Danh sach nhac" component={AudioScreen} options={{headerShown: false}}/>
       <Stack.Screen name="Player" component={Player} />
     </Stack.Navigator>
   );

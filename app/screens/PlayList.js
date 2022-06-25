@@ -16,11 +16,9 @@ import PlayListInputModal from "../components/PlayListInputModal";
 import { AudioContext } from "../Context/AudioProvider";
 import PlayListDetail from "../components/PlayListDetail";
 
-let selectedPlayList = {
+let selectedPlayList = {};
 
-}
-
-export default function PlayList({navigation}) {
+export default function PlayList({ navigation }) {
   const [modalVisibile, setModalVisible] = useState(false);
   const [showPlayList, setShowPlayList] = useState(false);
 
@@ -120,18 +118,24 @@ export default function PlayList({navigation}) {
       return AsyncStorage.setItem("playlist", JSON.stringify([...updateList]));
     }
     // if there is no audio selected then we want open the list
-    selectedPlayList = playList
-    setShowPlayList(true)
+    selectedPlayList = playList;
+    setShowPlayList(true);
   };
 
   const handlePress = () => {
-    navigation.navigate('Player')
-    setShowPlayList(false)
-  }
+    navigation.navigate("Player");
+    setShowPlayList(false);
+  };
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        style={{ backgroundColor: color.APP_BG }}
+      >
+        <View>
+          <Text style={styles.titlePage}>PlayList</Text>
+        </View>
         {playList.length
           ? playList.map((item) => {
               return (
@@ -142,7 +146,7 @@ export default function PlayList({navigation}) {
                     handleBannerPress(item);
                   }}
                 >
-                  <Text>{item.title}</Text>
+                  <Text style={styles.audioTitle}>{item.title}</Text>
                   <Text style={styles.audioCount}>
                     {item?.audios?.length > 1
                       ? `${item.audios.length} Songs`
@@ -166,7 +170,12 @@ export default function PlayList({navigation}) {
           onSubmit={createPlayList}
         />
       </ScrollView>
-      <PlayListDetail visible={showPlayList} playList={selectedPlayList} onClose={() => setShowPlayList(false)} onPress={handlePress}/>
+      <PlayListDetail
+        visible={showPlayList}
+        playList={selectedPlayList}
+        onClose={() => setShowPlayList(false)}
+        onPress={handlePress}
+      />
     </>
   );
 }
@@ -175,19 +184,34 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  playListBanner: {
-    padding: 5,
-    backgroundColor: "rgba(204, 204, 204, .3)",
-    borderRadius: 5,
+  titlePage: {
+    color: "#a01571",
+    fontSize: 28,
+    fontWeight: "bold",
+    marginHorizontal: 5,
     marginBottom: 15,
+  },
+  playListBanner: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "rgba(204, 204, 204, .3)",
+    borderRadius: 15,
+    marginBottom: 15,
+  },
+  audioTitle: {
+    color: "#ddd",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 5,
   },
   audioCount: {
     marginTop: 3,
     opacity: 0.5,
     fontSize: 14,
+    color: "#ccc",
   },
   playListBtn: {
-    color: color.ACTIVE_BG,
+    color: color.FONT_MEDIUM,
     letterSpacing: 3,
     fontWeight: "bold",
     fontSize: 14,

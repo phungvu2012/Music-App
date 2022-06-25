@@ -67,7 +67,7 @@ export default function Player() {
   const songSlider = useRef(null);
 
   useTrackPlayerEvents(
-    [Event.PlaybackTrackChanged, Event.PlaybackQueueEnded],
+    [Event.PlaybackTrackChanged],
     async (event) => {
       if (
         event.type === Event.PlaybackTrackChanged &&
@@ -77,15 +77,25 @@ export default function Player() {
         const { title, artwork, astist } = track;
         setTrackTitle(title);
         setTrackArtist(astist);
-        setTrackArtwork(artwork);
-        console.log("artwork: ", track)
-        console.log("songIndex: ", songIndex);
+        setTrackArtwork(arrPlayingImage[artwork] || arrPlayingImage[0]);
+        // console.log("artwork: ", track)
+        // console.log("songIndex: ", songIndex);
         if (repeatMode === "off") setIsEndQueue(false);
-        if (songIndex === songs.length - 1) {
+        if (songIndex > songs.length - 1) {
           console.log("end queue: ");
           setIsEndQueue(true);
         }
       }
+      console.log('change')
+    }
+  );
+
+  useTrackPlayerEvents(
+    [Event.PlaybackQueueEnded],
+    async (event) => {
+      if(event.type === Event.PlaybackQueueEnded()) {
+      }
+      // console.log('end pppppppppppppppppppppppppp')
     }
   );
 
@@ -118,6 +128,7 @@ export default function Player() {
 
   const skipTo = (trackId) => {
     TrackPlayer.skip(trackId);
+    console.log('-------------------------------------------- skip')
   };
 
   useEffect(() => {
@@ -128,10 +139,15 @@ export default function Player() {
     const getCurrentAudioData = async () => {
       const track = await TrackPlayer.getCurrentTrack();
       TrackPlayer.getTrack(track).then((data) => {
-        const { title, artword, astist } = data;
+        const { title, artwork, astist } = data;
         setTrackTitle(title);
         setTrackArtist(astist);
-        setTrackArtwork(artword);
+        setTrackArtwork(artwork);
+        
+        if (songIndex > songs.length - 1) {
+          console.log("end queue: ", songIndex, " - ", songs.length - 1);
+          setIsEndQueue(true);
+        }
       });
     };
 
@@ -153,10 +169,10 @@ export default function Player() {
 
   useEffect(() => {
     // console.log('hello: ', Math.floor(progress.duration), Math.floor(progress.position))
-    // console.log('dk: ', repeatMode === "off" && Math.floor(progress.duration) === Math.floor(progress.position) && isEndQueue, ' - ', repeatMode === "off" && Math.floor(progress.duration) === Math.floor(progress.position))
+    // console.log('dk: ', isEndQueue)
     if (
       repeatMode === "off" &&
-      Math.floor(progress.duration) === Math.floor(progress.position) &&
+      Math.floor(progress.duration) - Math.floor(progress.position) <= 0 &&
       isEndQueue
     ) {
       TrackPlayer.pause();
@@ -165,9 +181,12 @@ export default function Player() {
   }, [progress]);
 
   useEffect(() => {
-    // console.log('helloEm-----------------', songIndex, )
     setIsEndQueue(songIndex === songs?.length - 1);
-  }, [songs]);
+  }, [trackTitle, trackArtist, trackArtwork]);
+
+  useEffect(() => {
+    
+  })
 
   const skipToNext = () => {
     songSlider.current.scrollToOffset({
@@ -259,7 +278,14 @@ export default function Player() {
               minimumTrackTintColor="#FFD369"
               maximumTrackTintColor="#FFF"
               onSlidingComplete={async (value) => {
-                await TrackPlayer.seekTo(value);
+                console.log(Number(value) < Number(progress.position))
+                if(Number(value) < Number(progress.duration) || !isEndQueue) 
+                  await TrackPlayer.seekTo(value);
+                else {
+                  console.log('seek')
+                  await TrackPlayer.pause()
+                  await TrackPlayer.seekTo(0);
+                }
               }}
             />
             <View style={styles.progressLabelContainer}>

@@ -12,13 +12,15 @@ import AudioListItem from "./AudioListItem";
 import TrackPlayer from 'react-native-track-player'
 
 const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
-  const playAudio = async (audio) => {
-    console.log("audios: ", playList.audios);
+  const playAudio = async (audio, index) => {
+    // console.log("audios: ", playList.audios);
+    console.log('Playlist Index: ', index)
     await TrackPlayer.reset();
     if (playList.audios?.length > 0) {
     }
     await TrackPlayer.add(playList.audios);
-    TrackPlayer.play();
+    await TrackPlayer.play();
+    await TrackPlayer.skip(index);
     onPress();
   };
   return (
@@ -34,12 +36,12 @@ const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
           contentContainerStyle={styles.listContainer}
           data={playList.audios}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <View style={{ marginBottom: 10 }}>
               <AudioListItem
                 title={item.filename}
                 duration={item.duration}
-                onAudioPress={() => playAudio(item)}
+                onAudioPress={() => playAudio(item, index)}
               />
             </View>
           )}
@@ -57,11 +59,11 @@ const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 0,
+    top: 0,
     alignSelf: "center",
-    height: height - 150,
+    height: height,
     width: width - 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#523b76",
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
   },
@@ -75,8 +77,12 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontSize: 20,
-    paddingVertical: 5,
+    paddingVertical: 15,
+    // paddingTop: 20,
     fontWeight: "bold",
-    color: color.ACTIVE_BG,
+    color: color.FONT,
+    backgroundColor: '#724b66',
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
   },
 });

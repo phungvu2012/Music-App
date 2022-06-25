@@ -44,9 +44,9 @@ export default function AudioListItem({
                 styles.thumbnail,
                 {
                   backgroundColor: activeListItem
-                    ? color.ACTIVE_BG
-                    : color.FONT_LIGHT,
-                },
+                    ? '#826ba6'
+                    : '#321b56',
+                },  
               ]}
             >
               <Text style={styles.thumbnailText}>

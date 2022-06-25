@@ -17,6 +17,8 @@ const arrPlayingImage = [
   PlayerImage5,
 ];
 
+const numberImages = 5
+
 export const AudioContext = createContext();
 
 export class AudioProvider extends Component {
@@ -50,13 +52,13 @@ export class AudioProvider extends Component {
     let media = await MediaLibrary.getAssetsAsync({
       mediaType: "audio",
     });
+    console.log("media: ", media);
 
     media = await MediaLibrary.getAssetsAsync({
       mediaType: "audio",
       first: media.totalCount,
     });
 
-    console.log("media: ", media);
 
     const tmp = [];
     media.assets = media.assets.map((value) => {
@@ -69,7 +71,7 @@ export class AudioProvider extends Component {
         ...value,
         url: value.uri,
         title: value.filename,
-        // 'artwork': value.artwork || arrPlayingImage[value.id % (arrPlayingImage.length - 1)]
+        artwork: value.artwork || value.id % (numberImages - 1)
       };
     });
 

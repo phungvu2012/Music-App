@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 import Player from "./Player";
 import AudioList from "./AudioList";
@@ -11,6 +11,7 @@ import PlayList from "./PlayList";
 import PlayListDetail from "../components/PlayListDetail";
 
 const Tab = createBottomTabNavigator();
+const { width, height } = Dimensions.get("window");
 
 const AudioScreen = () => {
   const audioControllerContext = useContext(AudioControllerContext);
@@ -22,9 +23,10 @@ const AudioScreen = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        // tabBarStyle: { backgroundColor: "#222831" },
+        tabBarStyle: { backgroundColor: "#2b174a", position: 'absolute', top: (height), right: 0, left: 0, transform: [{ translateY: -48 }] },
         headerPressColor: "#fff",
-        // tabBarActiveTintColor: "#FFD369",
+        tabBarActiveTintColor: "#fff",
+        tabBarInactiveTintColor: '#999',
         headerShown: false,
       }}
     >
@@ -32,8 +34,8 @@ const AudioScreen = () => {
         name="Audio List"
         component={AudioList}
         options={{
-          tabBarIcon: (color, size = 24) => {
-            return <FontAwesome5 name="headset" size={size} color={color} />;
+          tabBarIcon: (color= '#888', size = 24) => {
+            return <FontAwesome5 name="headset" size={size} color='#888' />;
           },
         }}
       />
@@ -41,9 +43,9 @@ const AudioScreen = () => {
         name="PlayList"
         component={PlayList}
         options={{
-          tabBarIcon: (color, size = 24) => {
+          tabBarIcon: (color= '#888', size = 24) => {
             return (
-              <MaterialIcons name="library-music" size={size} color={color} />
+              <MaterialIcons name="library-music" size={size} color='#888' />
             );
           },
         }}

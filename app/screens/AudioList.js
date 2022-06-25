@@ -48,7 +48,7 @@ export class AudioList extends Component {
     if (currentTrack !== null) {
       const song = await TrackPlayer.getTrack(currentTrack);
       if (this.state.currentAudio.toString() !== song) {
-        console.log("changedddd: ", this.state.currentAudio);
+        // console.log("changedddd: ", this.state.currentAudio);
       }
     }
   }
@@ -140,9 +140,11 @@ export class AudioList extends Component {
     );
   };
 
-  filterData = (list) => {
+  filterData = (list, text) => {
     return list.filter((value) => {
-      return value.toString().indexOf() === textSearch;
+      console.log("------------------------------------------");
+      console.log(value.title.search(new RegExp(text, "i")));
+      return value.title.search(new RegExp(text, "i")) > -1;
     });
   };
 
@@ -151,10 +153,10 @@ export class AudioList extends Component {
       ...this.state,
       textSearch: text,
       dataProviderSearch: this.state.dataProviderSearch.cloneWithRows(
-        this.filterData(listAudio)
+        this.filterData(listAudio, text)
       ),
     });
-    console.log(this.state.textSearch);
+    // console.log(this.filterData(listAudio, text));
   };
 
   render() {
@@ -166,6 +168,9 @@ export class AudioList extends Component {
               {({ data }) => {
                 return (
                   <Screen>
+                    <View>
+                      <Text style={styles.titlePage}>Library</Text>
+                    </View>
                     <View style={styles.searchContainer}>
                       <Ionicons
                         name="ios-search-outline"
@@ -175,13 +180,19 @@ export class AudioList extends Component {
                       />
                       <TextInput
                         value={this.state.textSearch}
-                        onChangeText={(text) => this.handleSearch(text)}
+                        onChangeText={(text) =>
+                          this.handleSearch(text, audioFiles)
+                        }
                         style={styles.searchInput}
                       />
                     </View>
                     {/* {console.log("hello: ", audioFiles)} */}
                     <RecyclerListView
-                      dataProvider={dataProvider}
+                      dataProvider={
+                        this.state.textSearch.trim()
+                          ? this.state.dataProviderSearch
+                          : dataProvider
+                      }
                       layoutProvider={this.layoutProvider}
                       rowRenderer={this.rowRenderer}
                       extendedState={{ isPlaying: this.state.isPlaying }}
@@ -222,12 +233,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  titlePage: {
+    color: "#a01571",
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginHorizontal: 20,
+    marginBottom: 15,
+  },
   searchContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     // backgroundColor: "red",
-    borderRadius: 20,
+    backgroundColor: "#321b56",
+    borderRadius: 50,
     marginHorizontal: 10,
     marginBottom: 35,
     borderColor: color.ACTIVE_BG,
@@ -239,11 +258,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   searchInput: {
+    color: '#aaa',
     flex: 1,
     paddingVertical: 10,
     fontWeight: "bold",
     fontSize: 18,
-    // backgroundColor: "yellow",
     paddingHorizontal: 15,
   },
 });

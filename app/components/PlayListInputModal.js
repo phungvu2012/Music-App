@@ -1,41 +1,60 @@
-import { StyleSheet, Text, View, Modal, Dimensions, TouchableNativeFeedback } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  Dimensions,
+  TouchableNativeFeedback,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import { TextInput } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import color from "../misc/color";
 
 const PlayListInputModal = ({ visible, onClose, onSubmit }) => {
-//   console.log("visible : ", visible);
+  //   console.log("visible : ", visible);
 
-  const [playListName, setPlayListName] = useState('');
+  const [playListName, setPlayListName] = useState("");
 
-    
   const handleOnSubmit = () => {
-    if(!playListName.trim()) {
-        onClose();
+    if (!playListName.trim()) {
+      onClose();
+    } else {
+      // console.log('enter')
+      onSubmit(playListName);
+      setPlayListName("");
+      onClose();
     }
-    else {
-        // console.log('enter')
-        onSubmit(playListName);
-        setPlayListName('')
-        onClose();
-    }
-  }
+  };
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.inputContainer}>
-            <Text style={{color: color.ACTIVE_BG}}>Create New Playlist</Text>
-          <TextInput style={styles.input} value={playListName} onChangeText={(event) => setPlayListName(event)}/>
-          <AntDesign
+          <Text style={{ color: color.ACTIVE_BG }}>Create New Playlist</Text>
+          <TextInput
+            style={styles.input}
+            value={playListName}
+            onChangeText={(event) => setPlayListName(event)}
+          />
+          {/* <AntDesign
             name="check"
             size={24}
             color={color.ACTIVE_FONT}
             style={styles.submitIcon}
             onPress={() => {
-                handleOnSubmit()
+              handleOnSubmit();
             }}
-          />
+          /> */}
+          <TouchableOpacity
+            onPress={() => {
+              handleOnSubmit();
+            }}
+          >
+            <View style={styles.submitIcon}>
+              <Text style={styles.submitIconText}>Create</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
       <TouchableNativeFeedback onPress={onClose}>
@@ -74,13 +93,17 @@ const styles = StyleSheet.create({
   },
 
   submitIcon: {
-    padding: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     backgroundColor: color.ACTIVE_BG,
     borderRadius: 50,
     marginTop: 15,
   },
+  submitIconText: {
+    color: "#ddd",
+  },
   modalBG: {
     backgroundColor: color.MODAL_BG,
-    zIndex: -1
+    zIndex: -1,
   },
 });
