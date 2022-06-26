@@ -122,10 +122,14 @@ export default function PlayList({ navigation }) {
     setShowPlayList(true);
   };
 
-  const handlePress = () => {
-    navigation.navigate("Player");
+  const handlePress = (index) => {
+    navigation.navigate("Player", {audioIndex: index});
     setShowPlayList(false);
   };
+
+  const navigateGoBack = () => {
+    navigation.navigate("PlayList");
+  }
 
   return (
     <>
@@ -175,6 +179,7 @@ export default function PlayList({ navigation }) {
         playList={selectedPlayList}
         onClose={() => setShowPlayList(false)}
         onPress={handlePress}
+        navigateGoBack={navigateGoBack}
       />
     </>
   );

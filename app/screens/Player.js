@@ -19,6 +19,11 @@ import PlayerImage2 from "./../../assets/200.gif";
 import PlayerImage3 from "./../../assets/20108dbb48dbad29646e0f2cf022ce73.gif";
 import PlayerImage4 from "./../../assets/ComfortableFlawedChevrotain-max-1mb.gif";
 import PlayerImage5 from "./../../assets/blu-music-logo-4_800x600.gif";
+import PlayerImage6 from "./../../assets/giphy.gif";
+import PlayerImage7 from "./../../assets/music-vintage-background-hand-drawn-illustration-splash-blob-retro-design-with-turntable_251616-1487.webp";
+import PlayerImage8 from "./../../assets/giphy2.gif";
+import PlayerImage9 from "./../../assets/giphy1.gif";
+import PlayerImage10 from "./../../assets/music-background-with-splash-watercolor-heart-sketch-hand-drawn-vector-illustration_251616-2797.webp";
 import Slider from "@react-native-community/slider";
 
 import TrackPlayer, {
@@ -49,13 +54,19 @@ const arrPlayingImage = [
   PlayerImage3,
   PlayerImage4,
   PlayerImage5,
+  PlayerImage6,
+  PlayerImage7,
+  PlayerImage8,
+  PlayerImage9,
+  PlayerImage10,
 ];
 
-export default function Player() {
+export default function Player(props) {
+  const audioIndex = props?.route?.params?.audioIndex;
   const playbackState = usePlaybackState();
   const [songs, setSong] = useState([]);
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const [songIndex, setSongIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(audioIndex || 0)).current;
+  const [songIndex, setSongIndex] = useState(audioIndex || 0);
   const progress = useProgress();
   const [repeatMode, setRepeatMode] = useState("off");
 
@@ -77,12 +88,11 @@ export default function Player() {
         const { title, artwork, astist } = track;
         setTrackTitle(title);
         setTrackArtist(astist);
-        setTrackArtwork(arrPlayingImage[artwork] || arrPlayingImage[0]);
-        // console.log("artwork: ", track)
+        setTrackArtwork(artwork);
+        // console.log("artwork1: ", artwork)
         // console.log("songIndex: ", songIndex);
         if (repeatMode === "off") setIsEndQueue(false);
         if (songIndex > songs.length - 1) {
-          console.log("end queue: ");
           setIsEndQueue(true);
         }
       }
@@ -145,7 +155,7 @@ export default function Player() {
         setTrackArtwork(artwork);
         
         if (songIndex > songs.length - 1) {
-          console.log("end queue: ", songIndex, " - ", songs.length - 1);
+          console.log("end queue: ", audioIndex);
           setIsEndQueue(true);
         }
       });
@@ -223,9 +233,7 @@ export default function Player() {
         <View style={styles.artworkWrapper}>
           <Image
             source={
-              trackArtwork
-                ? trackArtwork
-                : arrPlayingImage[item.id % (arrPlayingImage.length - 1) || 0]
+                arrPlayingImage[item.id % (arrPlayingImage.length - 1) || 0]
             }
             style={styles.artworkImage}
           />

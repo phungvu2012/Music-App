@@ -9,6 +9,7 @@ import AudioList from "./AudioList";
 import { AudioControllerContext } from "../Context/AudioController";
 import PlayList from "./PlayList";
 import PlayListDetail from "../components/PlayListDetail";
+import Home from "./Home";
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get("window");
@@ -30,6 +31,15 @@ const AudioScreen = () => {
         headerShown: false,
       }}
     >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: (color= '#888', size = 24) => {
+            return <FontAwesome5 name="home" size={size} color='#888' />;
+          },
+        }}
+      />
       <Tab.Screen
         name="Audio List"
         component={AudioList}

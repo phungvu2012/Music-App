@@ -5,6 +5,7 @@ import {
   Modal,
   FlatList,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useContext, useEffect } from "react";
 import color from "../misc/color";
@@ -12,10 +13,11 @@ import AudioListItem from "./AudioListItem";
 import TrackPlayer from "react-native-track-player";
 import OptionModal from "./OptionModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AntDesign } from "@expo/vector-icons";
 
-import {AudioContext} from "../Context/AudioProvider";
+import { AudioContext } from "../Context/AudioProvider";
 
-const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
+const PlayListDetail = ({ visible, playList, onClose, onPress, navigateGoBack }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
   const [audios, setAudios] = useState(playList.audios);
@@ -23,9 +25,9 @@ const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
   const context = useContext(AudioContext);
 
   useEffect(() => {
-    setAudios(playList.audios)
-    console.log('hello2: ', playList.audios)
-  }, [playAudio, playList?.audios])
+    setAudios(playList.audios);
+    console.log("hello2: ", playList.audios);
+  }, [playAudio, playList?.audios]);
 
   const closeModal = () => {
     setSelectedItem({});
@@ -55,6 +57,24 @@ const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
     console.log(selectedItem);
   };
 
+  const removePlayList = async () => {
+    closeModal()
+    const newAudios = audios.filter((audio) => audio.id !== selectedItem.id);
+    const result = await AsyncStorage.getItem("playlist");
+
+    if (result !== null) {
+      const oldPlayList = JSON.parse(result);
+      const updatePLaylist = oldPlayList.filter(item => item.id !== playList.id);
+      console.log('remove playlist')
+
+      AsyncStorage.setItem("playlist", JSON.stringify(updatePLaylist));
+      context.updateState(context, { playList: updatePLaylist });
+    }
+    setAudios(newAudios);
+
+    console.log(selectedItem);
+  };
+
   const playAudio = async (audio, index) => {
     // console.log("audios: ", playList.audios);
     console.log("Playlist Index: ", index);
@@ -64,7 +84,7 @@ const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
     await TrackPlayer.add(playList.audios);
     await TrackPlayer.play();
     await TrackPlayer.skip(index);
-    onPress();
+    onPress(index);
   };
   return (
     <Modal
@@ -74,7 +94,16 @@ const PlayListDetail = ({ visible, playList, onClose, onPress }) => {
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>{playList.title}</Text>
+        <View style={{ position: "relative" }}>
+          <Text style={styles.title}>{playList.title}</Text>
+          <TouchableOpacity style={{ position: "absolute", top: 0, right: 5, paddingHorizontal: 15, paddingVertical: 15 }} onPress={removePlayList}>
+            <AntDesign
+              name="delete"
+              size={28}
+              color="#ffd369"
+            />
+          </TouchableOpacity>
+        </View>
         <FlatList
           contentContainerStyle={styles.listContainer}
           data={audios}

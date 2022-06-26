@@ -3,21 +3,7 @@ import React, { Component, createContext } from "react";
 import * as MediaLibrary from "expo-media-library";
 import { DataProvider } from "recyclerlistview";
 
-import PlayerImage1 from "./../../assets/blu-music-logo-4_800x600.gif";
-import PlayerImage2 from "./../../assets/200.gif";
-import PlayerImage3 from "./../../assets/20108dbb48dbad29646e0f2cf022ce73.gif";
-import PlayerImage4 from "./../../assets/ComfortableFlawedChevrotain-max-1mb.gif";
-import PlayerImage5 from "./../../assets/blu-music-logo-4_800x600.gif";
-
-const arrPlayingImage = [
-  PlayerImage1,
-  PlayerImage2,
-  PlayerImage3,
-  PlayerImage4,
-  PlayerImage5,
-];
-
-const numberImages = 5
+const numberImages = 10
 
 export const AudioContext = createContext();
 
