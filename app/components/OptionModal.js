@@ -12,6 +12,7 @@ import color from "../misc/color";
 export default function OptionModal({
   visible,
   currentItem,
+  options,
   onClose,
   onPlayPress,
   onPlayListPress,
@@ -26,14 +27,21 @@ export default function OptionModal({
             {filename}
           </Text>
           <View style={styles.optionContainer}>
-            <TouchableWithoutFeedback onPress={onPlayPress}>
+            {options.map((optn) => {
+              return (
+                <TouchableWithoutFeedback onPress={optn.onPress} key={optn.title}>
+                  <Text style={styles.option}>{optn.title}</Text>
+                </TouchableWithoutFeedback>
+              );
+            })}
+            {/* <TouchableWithoutFeedback onPress={onPlayPress}>
               <Text style={styles.option}>Play</Text>
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback>
               <Text style={styles.option} onPress={onPlayListPress}>
                 Add to Playlist
               </Text>
-            </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback> */}
           </View>
         </View>
         <TouchableWithoutFeedback onPress={onClose}>
@@ -50,7 +58,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     left: 0,
-    backgroundColor: '#2b1b44',
+    backgroundColor: "#2b1b44",
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     zIndex: 1000,
